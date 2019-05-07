@@ -1,9 +1,33 @@
 {% extends "_layout.html" %}
-{% block title %}
-  Homepage
-{% endblock %}
+
 {% block header %}
 {% endblock %}
 {% block content %}
-<h1>Homepage 2</h1>
+
+
+<div class="container">
+    <h1>Homepage</h1>
+    <h2>Registered Users</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Registered Users</th>
+                <th scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr scope="row">
+                <td>
+                    {{u.username}}
+                </td>
+                <td>
+                    {{u.email}}
+                </td>
+            </tr>
+            {% endfor %}             
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
