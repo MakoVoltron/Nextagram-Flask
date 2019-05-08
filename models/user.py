@@ -7,6 +7,7 @@ class User(BaseModel, UserMixin):
     username = pw.CharField(unique=True, null=False)
     email = pw.CharField(unique=True, null=False)
     password = pw.CharField(null=False)
+    profile_picture = pw.CharField(null=True, default=None)
 
     def validate(self):
         duplicate_user = User.get_or_none(
@@ -41,3 +42,8 @@ class User(BaseModel, UserMixin):
 
         return not valid_password
     
+class Images(BaseModel):
+    user = pw.ForeignKeyField(User, backref='images')
+
+    caption = pw.CharField(null=True, default=None)
+    likes = pw.IntegerField(default=0)

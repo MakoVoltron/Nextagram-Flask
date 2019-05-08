@@ -1,23 +1,24 @@
 {% extends '_layout.html'%}
 {% block content%}
 <div class="container">
-    <h1>Hi {{ current_user.username}}</h1>
 
-    <form method="POST" action="{{ url_for('sessions.create') }}">
+    <h1>Edit User {{ current_user.username}}</h1>
+
+    <form method="POST" action="{{ url_for('users.update', id=current_user.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="">Update username </label>
-                <input type="text" class="form-control" name="user_name" placeholder="Type new name">
+                <input type="text" class="form-control" value="{{user.username}}" name="new_user_name" placeholder="Type new name">
             </div>
         
             <div class="form-group">
                 <label for="">Update Email address</label>
-                <input type="email" class="form-control" name="email" placeholder="Type new email">
+                <input type="email" class="form-control" value="{{user.email}}" name="new_email" placeholder="Type new email">
             </div>
         
             <div class="form-group">
                 <label for="">Password</label>
-                <input type="password" class="form-control" name="password" placeholder="Password">
+                <input type="password" class="form-control" value="{{user.password}}" name="new_password" placeholder="Password">
             </div>
 
             <button type="submit" class="btn btn-warning">Update</button>

@@ -1,6 +1,18 @@
-{% extends "_layout.html" %}
-{% block content %}
+{% extends '_layout.html'%}
+{% block content%}
+<div class="container">
+    
+    <img src="{{ current_user.profile_picture }}" alt="" class="img-thumbnail">
+    
+    <h1>Hi {{ current_user.username}}</h1>
+    <p>{{ current_user.email }}</p>
 
-<h1>{{User.username}}</h1>
+    <h4>Update your account setting</h4>
+    <a class="btn btn-warning" href="{{ url_for('users.edit', id=current_user.id) }}">Update</a>
+    <a class="btn btn-primary" href="{{ url_for('images.upload_page')}}">Profile Photo from Images</a>
+
+</div>
+
 
 {% endblock %}
+

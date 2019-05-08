@@ -65,7 +65,7 @@ def create():
                         login_user(user, remember=True) #flask-login sets user_id in session
                 else:
                         login_user(user)
-                        return redirect(url_for('sessions.account'))
+                        return redirect(url_for('users.show', username=user.username))
 
         else:
                 flash('Invalid login credentials', 'danger')
@@ -77,44 +77,8 @@ def logout():
         flash(f'You were logged out.', 'warning')
         return redirect(url_for('home'))
 
-@sessions_blueprint.route('account')
-def account():
-        return render_template('account.html')
+# @sessions_blueprint.route('account')
+# def account():
+
+#         return render_template('account.html')
         
-
-        
-
-
-# @sessions_blueprint.route('/', methods=['GET', 'POST'])
-# def create():
-#     if request.method == 'POST':
-#         if request.form['password'] == 'password':
-#                 pass
-
-# @users_blueprint.route('/login', methods=['GET'])
-# def login():
-#     render_template('users/login.html', title="Sign In")
-#     password_to_check = request.form['password']
-#     hashed_password = user.hashed_password
-#     result = check_password_hash(hashed_password, password_to_check)
-
-#     if result == True:
-#         flash('Welcome back {user.username}!', 'success')
-#     else:
-#         flash('Invalid login credentials', 'danger')
-
-#     # return render_template('users/login.html', title="Sign In")
-
-
-
-#    if result:
-#                 flash(f'Welcome back {user.username}!', 'success')
-#                 if request.form.get('remember_me'):
-#                         flash('REMEMBERED!')
-#                         login_user(user, remember=True) #flask-login sets user_id in session
-#                 else:
-#                         login_user(user)
-#                         return redirect(url_for('home'))
-#         else:
-#                 flash('Invalid login credentials', 'danger')
-#         return render_template('new.html', title="Sign In")

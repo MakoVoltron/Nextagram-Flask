@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 from werkzeug.security import generate_password_hash
-
+from flask_login import current_user
 from models.user import User
 
 
@@ -49,27 +49,11 @@ def create():
 
 
 
-# @users_blueprint.route('/login', methods=['GET'])
-# def login():
-#     render_template('users/login.html', title="Sign In")
-#     password_to_check = request.form['password']
-#     hashed_password = user.hashed_password
-#     result = check_password_hash(hashed_password, password_to_check)
-
-#     if result == True:
-#         flash('Welcome back {user.username}!', 'success')
-#     else:
-#         flash('Invalid login credentials', 'danger')
-
-    # return render_template('users/login.html', title="Sign In")
-
-
-
-
+# SHOW USER ACCOUNT
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
-    user = User.get_by_id(username)
-    return render_template('show.html')
+    user = User.get(username=username)
+    return render_template('users/show.html', user=user)
 
 
 @users_blueprint.route('/', methods=["GET"])
@@ -79,35 +63,61 @@ def index():
 
 @users_blueprint.route('/<id>/edit', methods=['GET'])
 def edit(id):
-    pass
+    user = User.get_by_id(id)
+    id = user.id
+    
+    if current_user == user:
+        return render_template('users/edit.html', user=user)
+    else:
+        flash('Not authorised')
+        return redirect(url_for('home'))
 
-
+# UPDATE USER DETAILS
 @users_blueprint.route('/<id>', methods=['POST'])
 def update(id):
-    pass
+    user = User.get_by_id(id)
+
+    if not current_user == user:
+        flash('Not authorised')
+        return redirect(url_for('users/edit.html', username=current_user.username))
+    else:
+        new_user_name = request.form.get('new_user_name')
+        new_email = request.form.get('new_email')
+        new_password = request.form.get('new_password')
+
+        # VALIDATION CHECKS 
+        
+        # Checks if USERNAME exists in database
+        username_check = User.get_or_none(User.username == new_user_name)
+        if not username_check == user:
+            if username_check and not username_check == user:
+                    flash(f"User name is taken!", 'danger')
+                    # return redirect(url_for('users.edit.html'))
+                    return render_template('users/edit.html', user=user)
+        
+        # Checks if EMAIL exists in database
+        email_check = User.get_or_none(User.email == new_email)
+        if not email_check == user:
+            if email_check:
+                    flash(f"Email is taken! Try different one", 'danger')
+                    return render_template('users/edit.html', user=user)
 
 
+    # use UPDATE because using save will execute the validation in users.py
+        update_user = User.update(
+            username=new_user_name,
+            email=new_email,
+            password=new_password
+        ).where(User.id == id)
 
+        if not update_user.execute():
+            flash(f'Unable to update, try again.', 'danger')
+            return render_template('users/show.html')
+        
+        flash('Successfully updated', 'success')
+        # return redirect(url_for('home'))
+        return redirect(url_for('users.show'), username=new_user_name)
 
-# @users_blueprint.route('/', methods=['GET'])
-# def login():
-#     user = User.get_by_id(username)
-#     return render_template('show.html')
+        
 
-# @app.route("/register", methods=['GET', 'POST'])
-# def register():
-#     form = RegistrationForm()
-#     breakpoint()
-#     if form.validate_on_submit():
-#         flash(f'Account created for {form.username.data}!', 'success')
-#         return redirect(url_for('home'))
-#     else:
-#         # flash(f'Account Error', 'danger')
-#         return render_template('register.html', title="Sign Up", form=form)
-
-# REDUNTANT? - DELETE? 
-# @users_blueprint.route('/', methods=['POST'])
-# def signup():
-#     pass
-# REDUNTANT? - DELETE? 
-  
+    
