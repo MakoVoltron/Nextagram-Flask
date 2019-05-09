@@ -38,14 +38,34 @@
               <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
 
+            
             <ul class="navbar-nav ml-auto form-inline">
-          
+                <!-- Post Button -->
+                {% if current_user.is_authenticated %}
+                
+                
+                <span ><p class="m-auto">Hi, {{ current_user.username }}</p></span>
+                <form class="pr-2 pl-2" action="{{ url_for('images.post') }}" method="POST" enctype="multipart/form-data">
+                  <div id='post-button-box'>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input id="post-image" type="file" name="post-image" class="inputfile">
+                    <label for="post-image" class="my-auto ml-1"> Post</label>
+                  </div>
+                  <button id="post-upload" type="submit" class="d-none confirm-button" >Confirm</button>
+                </form>
+
+               
+                <a class="pr-2" href="{{url_for('users.show', username=current_user.username)}}">My Profile</a>
+                {% endif %}
+                
                 <li class="nav-item dropdown">
+                  
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     {% if current_user.is_authenticated %}
+                      
                       <a class="dropdown-item" href="{{url_for('users.show', username=current_user.username )}}">Account</a>
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="{{url_for('sessions.logout')}}">Log Out</a>
@@ -80,6 +100,21 @@
 
     {% block content %}
     {% endblock %}
+
+
+    <script>
+
+        $('#post-image').on('click', function(){
+          $('#post-button-box').addClass('d-none')
+          $('#post-upload').removeClass('d-none')
+        })
+
+        $('#post-upload').on('click', function(){
+          $('#post-upload').addClass('d-none')
+          $('#post-button-box').removeClass('d-none')
+        })
+
+    </script>
   </body>
 </html>
 

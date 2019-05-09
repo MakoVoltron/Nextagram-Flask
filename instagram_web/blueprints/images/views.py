@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, Blueprint, url_for
+from flask import Flask, render_template, request, redirect, Blueprint, url_for, flash
 from werkzeug import secure_filename
 from flask_login import current_user
 from helpers import *
 from models.user import User
+from models.image import Image
 
 images_blueprint = Blueprint('images',
                                 __name__,
@@ -18,6 +19,45 @@ images_blueprint = Blueprint('images',
 # def profile_image_url(self):
 #   return AWS_S3_DOMAIN + self.current_user.profile_picture
 
+@images_blueprint.route('/donations/<id>/new', methods=['GET'])
+def donate(id):
+    return render_template('braintree.html')
+
+
+@images_blueprint.route('/post', methods=['GET','POST'])
+def post():
+    if request.method == 'GET':
+        return render_template('post.html')
+    
+    if request.method == 'POST':
+        if "post-image" not in request.files:
+            flash(f"No post-image key in request.files", "warning")
+            return redirect(url_for('users.show', username=current_user.username))
+           
+
+        file    = request.files.get("post-image")
+
+        if file.filename == "":
+            flash(f"Please select a file", "warning")
+            return redirect(url_for('users.show', username=current_user.username))
+            
+
+        if file and allowed_file(file.filename):
+            file.filename = secure_filename(file.filename)
+            output   	  = upload_file_to_s3(file, S3_BUCKET)  
+            flash(f"Uploaded!", "success")
+            
+            new_image = Image(
+                URL=str(output),
+                user_id=current_user.id
+                ).save()
+            return redirect(url_for('users.show', image=new_image, username=current_user.username))
+        
+        else:
+            flash('Upload failed', 'danger')
+            return redirect("/")
+    
+         
 
 
 @images_blueprint.route('/upload', methods=['GET'])
@@ -63,9 +103,37 @@ def upload_file():
         User.update(profile_picture=str(output)).where(User.id == current_user.id).execute()
         return redirect(url_for('users.show', username=current_user.username))
         
-
     else:
         flash('Upload failed', 'danger')
         return redirect("/")
+        
+
+# UPLOAD POST
+# @images_blueprint.route("/", methods=["POST"])
+# def upload_post():
+
+#     if "user_file" not in request.files:
+#         return flash(f"No user_file key in request.files", "warning")
+
+#     file    = request.files.get("user_file")
+
+#     if file.filename == "":
+#         return flash(f"Please select a file", "warning")
+
+#     if file and allowed_file(file.filename):
+#         file.filename = secure_filename(file.filename)
+#         output   	  = upload_file_to_s3(file, S3_BUCKET)  
+#         flash(f"Uploaded!", "success")
+
+#         new_image = Image(
+#             URL=str(output),
+#             user_id=current_user.id
+
+#         )
+#         return redirect(url_for('users.show', image=new_image))
+        
+#     else:
+#         flash('Upload failed', 'danger')
+#         return redirect("/")
         
 

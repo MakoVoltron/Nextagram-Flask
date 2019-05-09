@@ -52,8 +52,23 @@ def create():
 # SHOW USER ACCOUNT
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
-    user = User.get(username=username)
-    return render_template('users/show.html', user=user)
+    user = User.get(User.username==username)
+    if user.username == current_user.username:
+        return render_template('users/show.html', user=user)
+    else:
+        return render_template('users/users.html', user=user)
+
+# @users_blueprint.route('/{{ current_user }}', methods=["GET"])
+# def profile(username):
+#     user = User.get(username=username)
+#     return render_template('users/show.html', user=user)
+
+
+
+# @users_blueprint.route('/<username>', methods=["GET"])
+# def show(username):
+#     user = User.get(username=username)
+#     return render_template('users/show.html', user=user)
 
 
 @users_blueprint.route('/', methods=["GET"])

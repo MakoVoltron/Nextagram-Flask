@@ -11,6 +11,21 @@
     <a class="btn btn-warning" href="{{ url_for('users.edit', id=current_user.id) }}">Update</a>
     <a class="btn btn-primary" href="{{ url_for('images.upload_page')}}">Profile Photo from Images</a>
 
+    <h2>Posts</h2>
+    
+    <div class="container">
+        <div class="d-flex">
+            {% for i in user.images %}
+            <div >
+                    <img src="{{ i.URL }}" class="img-thumbnail">
+                    <span class="d-block pt-1"></span><p>This is my post. Donate.</p></span>
+                    
+                    
+            </div>
+            {% endfor %}             
+        </div>
+    </div>
+
 </div>
 
 

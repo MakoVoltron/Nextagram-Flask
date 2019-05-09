@@ -19,7 +19,7 @@
             {% for u in users %}
             <tr scope="row">
                 <td>
-                    {{u.username}}
+                    <a href="http://localhost:5000/users/{{ u.username }}">{{u.username}}</a>
                 </td>
                 <td>
                     {{u.email}}

@@ -42,8 +42,9 @@ class User(BaseModel, UserMixin):
 
         return not valid_password
     
-class Images(BaseModel):
-    user = pw.ForeignKeyField(User, backref='images')
-
-    caption = pw.CharField(null=True, default=None)
-    likes = pw.IntegerField(default=0)
+# class Images(BaseModel):
+#     user = pw.ForeignKeyField(User, backref='images')
+#     URL = pw.CharField(null=False)
+#     caption = pw.CharField(null=True, default=None)
+#     likes = pw.IntegerField(default=0)
+#     donation = pw.IntegerField(default=0)

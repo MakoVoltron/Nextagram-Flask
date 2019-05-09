@@ -1,0 +1,30 @@
+{% extends '_layout.html'%}
+{% block content%}
+<div class="container">
+    
+    <img src="{{ user.profile_picture }}" alt="" class="img-thumbnail">
+    
+    <h1>Hi {{ user.username}}</h1>
+    <p>{{ user.email }}</p>
+
+    <h2>Posts</h2>
+    <div class="container">
+
+        <div class="container">
+            <div class="d-flex">
+                {% for i in user.images %}
+                <div >
+                    <img src="{{ i.URL }}" class="img-thumbnail">
+                    <span class="d-block pt-1"></span><p>This is my post. Donate.</p></span>
+                    <a href="{{ url_for('images.donate', id=i.id)}}" class="btn btn-outline-warning d-block pt-1">Donate</a>
+                </div>
+                {% endfor %}             
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
