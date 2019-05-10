@@ -19,9 +19,9 @@ images_blueprint = Blueprint('images',
 # def profile_image_url(self):
 #   return AWS_S3_DOMAIN + self.current_user.profile_picture
 
-@images_blueprint.route('/donations/<id>/new', methods=['GET'])
-def donate(id):
-    return render_template('braintree.html')
+# @images_blueprint.route('/donations/<id>/new', methods=['GET'])
+# def donate(id):
+#     return render_template('braintree.html')
 
 
 @images_blueprint.route('/post', methods=['GET','POST'])
