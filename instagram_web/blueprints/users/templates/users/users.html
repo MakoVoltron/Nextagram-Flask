@@ -7,14 +7,40 @@
         <h1>Hi {{ user.username}}</h1>
         <p>{{ user.email }}</p>
 
+      
+        
+        {% if not current_user.is_following(user) %} 
+            
+            <form action="{{ url_for('follows.create', idol_id=user.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-sm">Follow</button>
+            </form>
+
+        {% else %}
+
+            <form action="{{ url_for('follows.delete', idol_id=user.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
+            </form>
+
+        {% endif %}
+      
+        
+
+        <li>Followers: {{ user.fans | length}}</li>
+        <li>Following: {{ user.idols | length}}</li>
+
         <h2>Posts</h2>
         <div>
             <div class="d-flex">
                 {% for i in user.images %}
                 <div >
                     <img src="{{ i.URL }}" class="img-thumbnail">
+                   
                     <span class="d-block pt-1"></span><p>This is my post. Donate.</p></span>
                     <a href="{{ url_for('donations.new_donation', id=i.id)}}" class="btn btn-outline-warning pt-1">Donate</a>
+                    
+                    <li>Total collected: {{ i.donations | sum(attribute='donation_amount') }}</li>
                 </div>
                 {% endfor %}             
             </div>

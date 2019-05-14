@@ -8,4 +8,3 @@ class Image(BaseModel):
     URL = pw.CharField(null=False)
     caption = pw.CharField(null=True, default=None)
     likes = pw.IntegerField(default=0)
-    donation = pw.IntegerField(default=0)

@@ -2,12 +2,18 @@ from models.base_model import BaseModel
 import peewee as pw
 import re
 from flask_login import UserMixin
+from playhouse.hybrid import hybrid_property, hybrid_method
 
 class User(BaseModel, UserMixin):
     username = pw.CharField(unique=True, null=False)
     email = pw.CharField(unique=True, null=False)
     password = pw.CharField(null=False)
     profile_picture = pw.CharField(null=True, default=None)
+    private = pw.BooleanField(default=False)
+
+    @hybrid_property
+    def is_private(self):
+        return True if self.private else False
 
     def validate(self):
         duplicate_user = User.get_or_none(
@@ -42,6 +48,11 @@ class User(BaseModel, UserMixin):
 
         return not valid_password
     
+    @hybrid_method
+    def is_following(self, idol):
+        from models.followerfollowing import FollowerFollowing
+        return FollowerFollowing.get_or_none((FollowerFollowing.idol_id == idol.id) & (FollowerFollowing.fan_id == self.id))
+
 # class Images(BaseModel):
 #     user = pw.ForeignKeyField(User, backref='images')
 #     URL = pw.CharField(null=False)

@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash
 from werkzeug.security import generate_password_hash
-from flask_login import current_user
+from flask_login import current_user, login_required
 from models.user import User
+from models.donation import Donation
 
 
 users_blueprint = Blueprint('users',
@@ -53,7 +54,8 @@ def create():
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
     user = User.get(User.username==username)
-    if user.username == current_user.username:
+    
+    if current_user.is_authenticated and user.username == current_user.username:
         return render_template('users/show.html', user=user)
     else:
         return render_template('users/users.html', user=user)

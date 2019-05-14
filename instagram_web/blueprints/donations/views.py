@@ -2,6 +2,8 @@ from flask import Flask, Blueprint, redirect, url_for, render_template, request,
 import braintree
 from instagram_web.util.braintree import generate_client_token, transact, find_transaction
 from models.image import Image
+from models.donation import Donation
+from flask_login import current_user
 
 
 donations_blueprint = Blueprint('donations',
@@ -9,9 +11,7 @@ donations_blueprint = Blueprint('donations',
                                 template_folder='templates')
 
 
-# @donations_blueprint.route("/client_token", methods=["GET"])
-# def client_token():
-#   return generate_client_token()
+
 
 
 TRANSACTION_SUCCESS_STATUSES = [
@@ -30,6 +30,33 @@ def new_donation(id):
     image = Image.get_by_id(id)
     client_token = generate_client_token()
     return render_template('donations/new.html', image=image, client_token=client_token)
+
+
+@donations_blueprint.route('/<id>/donations', methods=['POST'])
+def create_checkout(id):
+    image = Image.get_by_id(id)
+    donation_amount = request.form.get('amount')
+    result = transact({
+        'amount': request.form['amount'],
+        'payment_method_nonce': request.form['payment_method_nonce'],
+        'options': {
+            "submit_for_settlement": True
+        }
+    })
+
+    if result.is_success or result.transaction:
+
+        new_donation = Donation(
+            image_id=image.id, 
+            donor=current_user.id,
+            donation_amount=donation_amount
+        ).save()
+        return redirect(url_for('donations.show_checkout', transaction_id=result.transaction.id, id=image))
+
+    else:
+        for x in result.errors.deep_errors: flash('Error: %s: %s' % (x.code, x.message))
+        return redirect(url_for('users.show', username=image.user.username))
+
 
 @donations_blueprint.route('<id>/<transaction_id>', methods=['GET'])
 def show_checkout(id, transaction_id):
@@ -51,20 +78,3 @@ def show_checkout(id, transaction_id):
     
     return render_template('donations/show.html', transaction=transaction, result=result, username=image.user.username)
 
-@donations_blueprint.route('/<id>/donations', methods=['POST'])
-def create_checkout(id):
-    image = Image.get_by_id(id)
-    result = transact({
-        'amount': request.form['amount'],
-        'payment_method_nonce': request.form['payment_method_nonce'],
-        'options': {
-            "submit_for_settlement": True
-        }
-    })
-
-    if result.is_success or result.transaction:
-        # return redirect(url_for('users.show', username=image.user.username))
-        return redirect(url_for('donations.show_checkout', transaction_id=result.transaction.id, id=image))
-    else:
-        for x in result.errors.deep_errors: flash('Error: %s: %s' % (x.code, x.message))
-        return redirect(url_for('users.show', username=image.user.username))

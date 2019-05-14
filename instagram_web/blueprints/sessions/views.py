@@ -5,6 +5,7 @@ from app import login_manager
 from flask import request, flash, url_for
 from models.user import User
 from flask_login import login_user, current_user, logout_user
+from instagram_web.helpers.google_oauth import oauth
 
 
 @login_manager.user_loader
@@ -17,6 +18,9 @@ def load_user(user_id):
 sessions_blueprint = Blueprint('sessions',
                                 __name__,
                                 template_folder='templates/sessions')
+
+
+
 
 @sessions_blueprint.route('/new', methods=['GET'])
 def new():
@@ -77,8 +81,32 @@ def logout():
         flash(f'You were logged out.', 'warning')
         return redirect(url_for('home'))
 
-# @sessions_blueprint.route('account')
-# def account():
 
-#         return render_template('account.html')
-        
+
+@sessions_blueprint.route('google_login/authorize', methods=["GET"])
+def authorize():
+        token = oauth.google.authorize_access_token()
+
+        if token:
+                email = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()['email']
+                user = User.get_or_none(User.email == email)
+
+                if not user:
+                        flash('Not registered with Google', 'danger')
+                        return redirect(url_for('users.show', username=user.username))
+                
+                else:
+                        login_user(user)
+                        flash(f'Welcome back {{user.username}}')
+                        return redirect(url_for('users.show', username=user.username))
+                # return redirect(url_for('users.show', username=user.username))
+        else:
+                flash('User not found', 'danger')
+                return redirect(url_for('users.show', username=user.username))
+                
+               
+
+@sessions_blueprint.route('google_login', methods=['GET'])
+def google_login():
+        redirect_uri = url_for('sessions.authorize', _external=True)
+        return oauth.google.authorize_redirect(redirect_uri)

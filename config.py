@@ -38,8 +38,11 @@ S3_SECRET                 = os.environ.get("S3_SECRET_ACCESS_KEY")
 S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 
 
-
+# Braintree Keys
 MERCHANT_ID               = os.environ.get("MERCHANT_ID")
 PUBLIC_KEY                = os.environ.get("PUBLIC_KEY")
 PRIVATE_KEY               = os.environ.get("PRIVATE_KEY")
 
+# Google Client Keys
+GOOGLE_CLIENT_ID               = os.environ.get("G_CLIENT_ID")
+GOOGLE_CLIENT_SECRET           = os.environ.get("G_CLIENT_SECRET")
